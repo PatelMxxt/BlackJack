@@ -46,11 +46,11 @@ public class BlackjackGame {
     }
 
     public boolean playerWins() {
-        return playerHand.getValue() <= 21 && playerHand.getValue() > dealerHand.getValue();
+        return playerHand.getValue() > dealerHand.getValue() && !playerBusted();
     }
 
     public boolean dealerWins() {
-        return dealerHand.getValue() <= 21 && dealerHand.getValue() > playerHand.getValue();
+        return dealerHand.getValue() > playerHand.getValue() && !dealerBusted();
     }
 
     public boolean push() {
@@ -58,55 +58,43 @@ public class BlackjackGame {
     }
 
     public void play() {
-        dealInitialCards();
         Scanner scanner = new Scanner(System.in);
-        boolean playerTurn = true;
+        dealInitialCards();
+        System.out.println("Player's hand: " + playerHand);
+        System.out.println("Dealer's hand: " + dealerHand);
 
-        while (playerTurn) {
-            System.out.println("Player's hand:");
-            System.out.println(playerHand);
-            System.out.println("Player's hand value: " + playerHand.getValue());
-            System.out.println("Dealer's hand:");
-            System.out.println(dealerHand);
-            System.out.println("Dealer's hand value: " + dealerHand.getValue());
-
-            if (playerBusted()) {
-                System.out.println("Player busts! Dealer wins.");
-                return;
-            }
-
-            System.out.println("Do you want to hit or stand? (hit/stand)");
-            String decision = scanner.nextLine();
-
-            if ("hit".equalsIgnoreCase(decision)) {
+        while (true) {
+            System.out.print("Do you want to hit or stand? (h/s): ");
+            String action = scanner.nextLine();
+            if (action.equalsIgnoreCase("h")) {
                 playerHit();
-            } else if ("stand".equalsIgnoreCase(decision)) {
-                playerTurn = false;
+                System.out.println("Player's hand: " + playerHand);
+                if (playerBusted()) {
+                    System.out.println("Player busted! Dealer wins.");
+                    return;
+                }
             } else {
-                System.out.println("Invalid input. Please type 'hit' or 'stand'.");
+                break;
             }
         }
 
         while (dealerHand.getValue() < 17) {
             dealerHit();
+            System.out.println("Dealer's hand: " + dealerHand);
+            if (dealerBusted()) {
+                System.out.println("Dealer busted! Player wins.");
+                return;
+            }
         }
 
-        System.out.println("Final hands:");
-        System.out.println("Player's hand:");
-        System.out.println(playerHand);
-        System.out.println("Player's hand value: " + playerHand.getValue());
-        System.out.println("Dealer's hand:");
-        System.out.println(dealerHand);
-        System.out.println("Dealer's hand value: " + dealerHand.getValue());
-
-        if (dealerBusted()) {
-            System.out.println("Dealer busts! Player wins.");
-        } else if (playerWins()) {
-            System.out.println("Player wins!");
+        if (playerWins()) {
+            System.out.println("Player wins with " + playerHand.getValue() + " points!");
         } else if (dealerWins()) {
-            System.out.println("Dealer wins!");
+            System.out.println("Dealer wins with " + dealerHand.getValue() + " points!");
         } else if (push()) {
             System.out.println("It's a push!");
+        } else {
+            System.out.println("Dealer wins.");
         }
     }
 
@@ -114,5 +102,6 @@ public class BlackjackGame {
         BlackjackGame game = new BlackjackGame();
         game.play();
     }
-    
 }
+
+
